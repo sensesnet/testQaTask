@@ -1,0 +1,109 @@
+Below is present a customer requirement:
+“Create a script which will give the possibility to:
+- show interface configuration in case option 1 is chosen (get interface configuration)
+- Set/modify network interface configuration in case option 2 is chosen, interface can be configured static or dynamic”
+
+Activities to be done:
+    a) Create Block Diagram of the requirement
+    b) Define all Regression (End to End) Test Scenarios for this requirement.
+    c) Define to Software Development team following Defect (BUG) in English:
+"Interface eth2 can be configured via DHCP, but not with IP address 192.168.3.3/24. -Test Failed."
+
+**************************************************************************************
+1) Create Block Diagram of the requirement:
+Option 1:
+
+ - Checking available network interfaces:
+        # ip a |awk '/state UP/{print $2}'
+
+ - Checking IP address of the network interface
+        # ip -o a show | cut -d ' ' -f 2,7
+        or
+        # ip a |grep -i inet | awk '{print $7, $2}'
+
+ - Check the MAC address of the NIC
+        # ip link show dev eth0 |awk '/link/{print $2}'
+
+        #!/bin/sh
+        ip a |awk '/state UP/{print $2}' | sed 's/://' | while read output;
+        do
+        echo $output:
+        ethtool -P $output
+        done
+
+ - Check the speed of the network interface port
+        #ethtool eth0 |grep "Speed:"
+
+        # vi /opt/scripts/port-speed.sh
+
+        #!/bin/sh
+        ip a |awk '/state UP/{print $2}' | sed 's/://' | while read output;
+        do
+        echo $output:
+        ethtool $output |grep "Speed:"
+        done
+
+ - Shell Script to Verify Network Interface Card Information
+        # vi /opt/scripts/nic-info.sh
+
+        #!/bin/sh
+        hostname
+        echo "-------------"
+        for iname in $(ip a |awk '/state UP/{print $2}')
+        do
+        echo "$iname"
+        ip a | grep -A2 $iname | awk '/inet/{print $2}'
+        ip a | grep -A2 $iname | awk '/link/{print $2}'
+        ethtool $iname |grep "Speed:"
+        done
+
+Option2:
+    Set:
+        - On Linux machines, eth0 and eth1 correspond to real network ports. To add an eth2,
+        you'll need to add another NIC, either by adding an internal PCI(e) network card,
+        or by adding a USB network adapter.
+
+        - Let us assume that you are sure that you have 3 NIC cards, but somehow when you do
+        ifconfig your output is something along the lines of: lo; eth0; eth1
+
+        - If you have 3 NIC cards, but only two ports. That is because ifconfig only shows those
+        ports which are "up". So the only thing that you need to do is to run the command:
+
+          ifconfig eth2 up
+
+          ifconfig eth2 192.168.222.2 netmask 255.255.255.0 up
+
+    Modify:
+        - Display Information of All Network Interfaces
+            # ifconfig -a
+
+        - Enable or Disable Network Interface
+            # ifconfig eth0 down
+
+        - Assign a IP Address to Network Interface
+            # ifconfig eth0 172.16.25.125
+
+        - Assign a Netmask to Network Interface
+            # ifconfig eth0 netmask 255.255.255.224
+
+        - Assign a Broadcast to Network Interface
+            # ifconfig eth0 broadcast 172.16.25.63
+
+        - Change MTU for an Network Interface
+            # ifconfig eth0 mtu 1000
+
+        - Enable Promiscuous Mode
+            # ifconfig eth0 promisc
+
+        - Add New Alias to Network Interface
+            # ifconfig eth0:0 172.16.25.127
+
+        - Remove Alias to Network Interface
+            # ifconfig eth0:0 down
+
+        - Change the MAC address of Network Interface
+            # ifconfig eth0 hw ether AA:BB:CC:DD:EE:FF
+
+
+    Really i trie to use this command to test expected condition and in case when something wrong
+    in test defect i described sequence of command for reproduce case

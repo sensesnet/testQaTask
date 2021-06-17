@@ -1,0 +1,53 @@
+Networking questions
+
+    1 How does the ping work
+    2 If A can ping B and B can ping C, does it mean that A can ping C?
+    3 Configure a switch interface to be access vlan 24.
+    4 What is the difference between a router and a switch
+    5 What is the difference between TCP and UDP
+    6 What are the main usages of VLANs
+
+**************************************************************************************
+
+    1.The ping command first sends an echo request packet to an address, then waits for a reply.
+      The ping is successful only if:
+      the echo request gets to the destination, and the destination is able to get an echo reply
+      back to the source within a predetermined time called a timeout.
+
+    2.You are on host A. Using -R makes B listen on a port and forward to C.
+      This might be fine, depending on how wide open your access to B is.
+      Using -L makes A listen on a port, and tunnel the connection through B to C.
+      So, let's say B is 10.10.10.10 and C is 20.20.20.20, and you want to connect to C via ssh.
+      You run this command:
+
+      ssh -L 8000:20.20.20.20:22 user@10.10.10.10
+
+      Now A is listening on port 8000, but connections to it will be tunneled through to 20.20.20.20:22,
+      so in a local shell, run this command:
+      ssh user@127.0.0.1:8000
+
+      This will make the connection to C (via your open session to B). Substitute other ports for other services,
+      e.g. to connect to a webserver on C:
+
+      ssh -L 8000:20.20.20.20:80 user@10.10.10.10
+
+    3.To add ports to these VLANs, assign them as follows:
+
+      sw# configure terminal
+      sw(config)# interface FastEthernet 0/12
+      sw(config-if)# switchport mode access
+      sw(config-if)# switchport access vlan 24
+
+    4.Just as a switch connects multiple devices to create a network, a router
+      connects multiple switches, and their respective networks, to form an even larger network.
+
+    5.TCP is a communications protocol, using which the data is transmitted between systems over the network.
+      In this, the data is transmitted into the form of packets.
+      It includes error-checking, guarantees the delivery and preserves the order of the data packets.
+      UDP is same as the TCP protocol except this doesn’t guarantee the error-checking and data recovery.
+      If you use this protocol, the data will be sent continuously, irrespective of the issues in the receiving end.
+
+    6.VLAN allows different computers and devices to be connected virtually to each other as if they were in a LAN
+      sharing a single broadcast domain. In a way, a VLAN acts mini separate networks within a LAN. A VLAN is helpful
+      for organizational use mainly because it can be used to segment a larger network into smaller segments. As shown
+      in the figure below, different VLANs can be used for different groups of users, departments, functions, etc.

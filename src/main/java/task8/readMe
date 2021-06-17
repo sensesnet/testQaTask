@@ -1,0 +1,29 @@
+Linux questions
+
+    1 Reconfigure interface eth1 from 192.168.140.89 machine to get dynamic an IP address from DHCP Server.
+    2 Create a folder. Capture traffic from interface eth1 to a .pcap file in this folder.
+    3 Create a bash script which will show last 20 rows from system log file.
+    4 What is the usages of “grep”
+    5 What is the usages of “cat”
+
+**************************************************************************************
+    1.   Need to change interfaces file, from way: /etc/network/interfaces
+    auto configuring:
+          auto eth1
+          allow-hotplug eth1
+          iface eth1 inet dhcp
+
+    2.As an alternative, you can run the following command line as user root which will
+    stop automatically after 60 seconds.
+
+     # mkdir –p /tmp/cd ; tcpdump -n -nn -N -s 0 -i eth1 -w /tmp/cd/eth1.pcap & pid=$! ; sleep 60 ; kill -1 $pid
+
+    3. sudo tail -n 20 /var/log/messages
+
+    4.The grep command which stands for “global regular expression print,” processes text
+    line by line and prints any lines which match a specified pattern. The grep command is
+    used to search text or searches the given file for lines containing a match to the given
+    strings or words. By default, grep displays the matching lines.
+
+    5.The cat command allows us to create single or multiple files,
+    view contain of file, concatenate files and redirect output in terminal or files.
